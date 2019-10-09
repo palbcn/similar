@@ -52,7 +52,7 @@
   /**
   computeSimilarityPairsPrim - private primitive
   
-	Computes the distance between two character pairs
+	Computes the similarity between two character pairs
 	  iterates through the letter pairs to find the size of the intersection.
 	Note that whenever a match is found, that character pair is removed from the
 	  second array list to prevent us from matching against the same character pair
@@ -60,7 +60,8 @@
 	
   @input p,q first and second pairs array
   
-  @return the distance
+  @return the similarity is calculated using the Sørensen–Dice coefficient, twice
+  the size of the intersection over the size of the union (the sum of the individual cardinalities)
   
   */
 	function computeSimilarityPairsPrim(p, q) {
