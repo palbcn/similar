@@ -1,50 +1,96 @@
-/* Pere Albert, Barcelona. palbcn@yahoo.com */
+/*
 
-/* REFERENCE:
-"How to strike a match"; by Simon White
-http://www.devarticles.com/c/a/Development-Cycles/How-to-Strike-a-Match
+  similar - detect similar strings using the Simon White's approximate string 
+  matching method, considering adjacent letter pairs.
 
-Original JAVA implementation by Simon White
-refactored and translated to pascal
-and then heavily adapted to javascript by Pere Albert
+  based on "How to strike a match" by Simon White
+  http://www.devarticles.com/c/a/Development-Cycles/How-to-Strike-a-Match
+  (the original document seems missed, found again in 
+  http://www.catalysoft.com/articles/StrikeAMatch.html)
 
- */
+  Original Java implementation by Simon White
+  refactored and translated to Pascal by Pere Albert
+  and readapted to javascript by Pere Albert
+
+  Pere Albert, Barcelona. <palbcn@yahoo.com> 
+
+*/
 
 (function simNS() {
 
-	const pastrings = require('pastrings');
+	/** 
+  creatLetterPairs - private primitive 
+  remove all non chars and transform all accented chars from a string and create
+  an array of adjacent letter pairs.
+  
+  @parm str input string 
+	
+  @return an array of adjacent letter pairs 
+  
+  */
+  function createLetterPairs(str) {
+    
+    // replace characters with diacritics "`´^¨~,º" (for example À) 
+    // with the equivalent letter without diacritics (in the example, A)
+    function replaceDiacritics(str) {
+      const WITH_DIACRITICS    = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëğÇçĞÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿı¿¡'.split('');
+      const WITHOUT_DIACRITICS = 'AAAAAAaaaaaaOOOOOOooooooEEEEeeeeDCcDIIIIiiiiUUUUuuuuNnSsYyyZz?!'.split('');
+      var ain = str.split('');
+      var aou = ain;
+      var lin = ain.length;
+      for (var i = 0; i < lin; i++) {
+        var j = WITH_DIACRITICS.indexOf(ain[i]);  
+        if (j!=-1) {
+          aou[i] = WITHOUT_DIACRITICS[j];
+        }
+      }
+      return aou.join('');
+    };
 
-	/* return an array of adjacent letter pairs contained in the input string remove all non chars and transform all accented*/
-	function createLetterPairs(str) {
-		if (!str)
-			return [];
-		var pairs = [];
-		var s = pastrings.removeNonWordChars(pastrings.replaceAccents(str)).toLowerCase();
-		for (var i = 0, l = s.length - 1; i < l; i++) {
+    // replace all non word chars in the string with the provided replacement char or string
+    //
+    // use a regex
+    //   "["  non "^"    word chars "\w"  "]" in any occurence "g"
+    function replaceNonWordChars(str,replaclementStr) {
+      return str.replace(/[^\w]/g,replaclementStr);
+    };   
+    
+		if (!str) return [];
+		let pairs = [];
+		let s = replaceNonWordChars(replaceDiacritics(str),'').toLowerCase();
+		for (let i = 0, l = s.length - 1; i < l; i++) {
 			pairs.push(s.slice(i, i + 2));
 		}
 		return pairs;
 	}
 
-	// Computes the distance between two character pairs
-	//   iterates through the letter pairs to find the size of the intersection.
-	//   Note that whenever a match is found, that character pair is removed from the
-	//   second array list to prevent us from matching against the same character pair
-	//  multiple times. (Otherwise, ‘GGGGG’ would score a perfect match against ‘GG’.)
-	//
+  /**
+  computeSimilarityPairsPrim - private primitive
+  
+	Computes the distance between two character pairs
+	  iterates through the letter pairs to find the size of the intersection.
+	Note that whenever a match is found, that character pair is removed from the
+	  second array list to prevent us from matching against the same character pair
+	  multiple times. (Otherwise, ‘GGGGG’ would score a perfect match against ‘GG’.)
+	
+  @input p,q first and second pairs array
+  
+  @return the distance
+  
+  */
 	function computeSimilarityPairsPrim(p, q) {
-		var intersection = 0;
-		var union = p.length + q.length;
-		for (var i = 0, l = p.length; i < l; i++) {
-			for (var j = 0, m = q.length; j < m; j++) {
-				if (p[i] == q[j]) {
-					intersection++;
-					q.splice(j, 1); // remove from the second pairs array
-					break;
+		let intersection = 0;
+		let union = p.length + q.length;
+		for (let i = 0, l = p.length; i < l; i++) {  //for each pair in p
+			for (let j = 0, m = q.length; j < m; j++) { // compare with each pair in q
+				if (p[i] == q[j]) {  // if match, 
+					intersection++;    // increment interserction counter
+					q.splice(j, 1);    // and remove it from the second pairs array
+					break;   // stop searching this pair 
 				}
 			}
 		}
-		return 2.0 * intersection / union;
+		return 2.0 * intersection / union;  // best is 1 worst is 0
 	}
 
 	// Computes the similarity between two character pairs
@@ -76,26 +122,36 @@ and then heavily adapted to javascript by Pere Albert
 		return r;
 	}
     
+    
+  let isArray = x => Array.isArray(x);
+	let isString = s => typeof(s) === 'string' || s instanceof String;
+  
   // compute similarity
 	function computeSimilarity(a, b) {
 		if (b) {  // when invoked with second parm, just select the correct primitive    
-			if (pastrings.isArray(a) && pastrings.isArray(b))
+			if (isArray(a) && isArray(b))
 				return computeSimilarityBetweenPairs(a, b);
-			else if (pastrings.isString(a) && pastrings.isString(b))
+			else if (isString(a) && isString(b))
 				return computeSimilarityBetweenStrings(a, b);
-			else if (pastrings.isString(a) && pastrings.isArray(b))
+			else if (isString(a) && isArray(b))
 				return computeSimilarityBetweenStringAndPairs(a, b);
-			else if (pastrings.isArray(a) && pastrings.isString(b))
+			else if (isArray(a) && isString(b))
 				return computeSimilaritiesBetweenListAndString(a, b);
 			else
 				throw new Error('cannot compute similarities');
 
-		} else { // when invoked with a single parameter, allow currying
-			let p = createLetterPairs(a);
-			return function (b) {
-				return computeSimilarityBetweenStringAndPairs(b, p)
-			};
-
+		} else { // when invoked with a single parameter, return the pairs
+			return createLetterPairs(a);
+      
+			/* previously we returned a function to allow currying ..
+         but current method allows more flexibility and is more efficient in
+         certaing cases as it permits storing arrays of pairs 
+         
+         here is the old currying code ...
+          let p=createLetterPairs(a);
+          return function (b) {
+            return computeSimilarityBetweenStringAndPairs(b, p)
+          }; */
 		}
 	}
 
@@ -112,10 +168,11 @@ and then heavily adapted to javascript by Pere Albert
 
 	} else {
 		(function main() {
-			console.log(computeSimilarity('asdfasd fasdf asfd', 'asdfasdfasffasfd'));
-			console.log(computeSimilarity('asdfasd fasdf asfd', createLetterPairs('asdfasdfasffasfd')));
-			console.log(computeSimilarity(['asdfasd fasdf asfd', 'asdf afsas dfasdf', 'asdfafdsa faf fasd'], 'asdfasdfasffasfd'));
-			console.log(computeSimilarity('asdfasd fasdf asfd')('asdfasdfasffasfd'));
+			console.log(computeSimilarity('bob dylan like a rolling stone', 'bob dylan like a rolling stone'));
+			console.log(computeSimilarity('bob dylan like a rolling stone', 'Bob Dylan - Like a Rolling Stone.mp3'));
+			console.log(computeSimilarity('Bob Dylan - Like a Rolling Stone.mp3'));
+			console.log(computeSimilarity('bob dylan like a rolling stone', computeSimilarity('Bob Dylan - Like a Rolling Stone.mp3')));
+			console.log(computeSimilarity(['Bob Dylan - Like A Rolling Stone - Live 1999.mp3', 'Bob Dylan - Forever Young.mp3', 'The Rolling Stones - RubyTuesday.mp3'], 'bob dylan like a rolling stone'));
 		})();
 	}
 
