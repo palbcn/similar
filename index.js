@@ -9,14 +9,16 @@
   http://www.catalysoft.com/articles/StrikeAMatch.html)
 
   Original Java implementation by Simon White
-  refactored and translated to Pascal by Pere Albert
-  and readapted to javascript by Pere Albert
+  first refactored and translated to Pascal by Pere Albert
+  and then readapted to javascript by Pere Albert
 
   Pere Albert, Barcelona. <palbcn@yahoo.com> 
 
 */
 
 (function simNS() {
+  
+  const replaceDiacritics = require("replace-diacritics");
 
 	/** 
   creatLetterPairs - private primitive 
@@ -30,23 +32,6 @@
   */
   function createLetterPairs(str) {
     
-    // replace characters with diacritics "`´^¨~,º" (for example À) 
-    // with the equivalent letter without diacritics (in the example, A)
-    function replaceDiacritics(str) {
-      const WITH_DIACRITICS    = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëğÇçĞÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿı¿¡'.split('');
-      const WITHOUT_DIACRITICS = 'AAAAAAaaaaaaOOOOOOooooooEEEEeeeeDCcDIIIIiiiiUUUUuuuuNnSsYyyZz?!'.split('');
-      var ain = str.split('');
-      var aou = ain;
-      var lin = ain.length;
-      for (var i = 0; i < lin; i++) {
-        var j = WITH_DIACRITICS.indexOf(ain[i]);  
-        if (j!=-1) {
-          aou[i] = WITHOUT_DIACRITICS[j];
-        }
-      }
-      return aou.join('');
-    };
-
     // replace all non word chars in the string with the provided replacement char or string
     //
     // use a regex
