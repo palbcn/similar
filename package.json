@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest"
   },
-  "author": "PAL BCN <palbcn@yahoo.com> (laperalimonera.com)",
+  "author": "PAL BCN <palbcn@yahoo.com>",
   "license": "MIT",
   "devDependencies": {
     "jest": "^24.9.0"

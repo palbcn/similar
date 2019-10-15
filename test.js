@@ -50,17 +50,23 @@ describe("character pairs can be compared with different strings",() => {
 });
 
 describe("a list of strings can be compared with a single string",() => {
-  let res = computeSimilarity(['bob dylan like a rolling stone', 'Bob Dylan - Like a Rolling Stone.mp3', 'Immanuel Kant - Kritik der reinen Vernunft'],'bob dylan like a rolling stone');
-
+  let res = computeSimilarity(['Bob Dylan - Like a Rolling Stone.mp3', 'bob dylan like a rolling stone', 'Immanuel Kant - Kritik der reinen Vernunft'],'bob dylan like a rolling stone');
   
   test('returns an array', () => {
     expect(Array.isArray(res)).toBe(true);
   });
   
   test('returns corresponding similarities', () => {
-    expect(res[0]).toBe(1);
-    expect(res[1]).toBeCloseTo(0.9,1);
+    expect(res[0]).toBeCloseTo(0.9,1);
+    expect(res[1]).toBe(1);
     expect(res[2]).toBeCloseTo(0.1,1);
+  });
+
+  test('may be used to find the closest match', () => {
+    let maxVal = Math.max(...res);
+    let indexOfMaxVal = res.indexOf(maxVal);
+    expect(maxVal).toBe(1);
+    expect(indexOfMaxVal).toBe(1);    
   });
   
 });

@@ -3,7 +3,7 @@
 	similar - detect similar strings
 	using the Simon White's approximate string 	matching method, 
 	that computes the Sørensen–Dice similarity coefficient
-	of sets of adjacent letter pairs.
+	of sets of adjacent letter pairs also called bigrams.
 
   based on "How to strike a match" by Simon White
   http://www.devarticles.com/c/a/Development-Cycles/How-to-Strike-a-Match
@@ -11,10 +11,10 @@
   http://www.catalysoft.com/articles/StrikeAMatch.html)
 
   Original Java implementation by Simon White
-  first refactored and translated to Pascal by Pere Albert
-  and then readapted to javascript by Pere Albert
+  first refactored and translated to Pascal by palbcn
+  and then readapted to javascript by palbcn
 
-  Pere Albert, Barcelona. <palbcn@yahoo.com> 
+  PAL, Barcelona. <palbcn@yahoo.com> 
 
 */
 
@@ -23,7 +23,7 @@
   const replaceDiacritics = require("replace-diacritics");
 
 	/** 
-  creatLetterPairs - private primitive 
+  createLetterPairs - private primitive 
   remove all non chars and transform all accented chars from a string and create
   an array of adjacent letter pairs.
   
