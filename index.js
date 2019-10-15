@@ -1,7 +1,9 @@
 /*
 
-  similar - detect similar strings using the Simon White's approximate string 
-  matching method, considering adjacent letter pairs.
+	similar - detect similar strings
+	using the Simon White's approximate string 	matching method, 
+	that computes the SÃ¸rensenâ€“Dice similarity coefficient
+	of sets of adjacent letter pairs.
 
   based on "How to strike a match" by Simon White
   http://www.devarticles.com/c/a/Development-Cycles/How-to-Strike-a-Match
@@ -25,7 +27,7 @@
   remove all non chars and transform all accented chars from a string and create
   an array of adjacent letter pairs.
   
-  @parm str input string 
+  @parm str input string
 	
   @return an array of adjacent letter pairs 
   
@@ -56,12 +58,12 @@
 	  iterates through the letter pairs to find the size of the intersection.
 	Note that whenever a match is found, that character pair is removed from the
 	  second array list to prevent us from matching against the same character pair
-	  multiple times. (Otherwise, ‘GGGGG’ would score a perfect match against ‘GG’.)
+	  multiple times. (Otherwise, 'GGGGG' would score a perfect match against 'GG'.)
 	
   @input p,q first and second pairs array
   
-  @return the similarity is calculated using the Sørensen–Dice coefficient, twice
-  the size of the intersection over the size of the union (the sum of the individual cardinalities)
+  @return the similarity is calculated using the SÃ¸rensenâ€“Dice coefficient, twice
+	the size of the intersection over the size of the union (the sum of the individual cardinalities)
   
   */
 	function computeSimilarityPairsPrim(p, q) {
@@ -154,11 +156,15 @@
 
 	} else {
 		(function main() {
-			console.log(computeSimilarity('bob dylan like a rolling stone', 'bob dylan like a rolling stone'));
-			console.log(computeSimilarity('bob dylan like a rolling stone', 'Bob Dylan - Like a Rolling Stone.mp3'));
-			console.log(computeSimilarity('Bob Dylan - Like a Rolling Stone.mp3'));
-			console.log(computeSimilarity('bob dylan like a rolling stone', computeSimilarity('Bob Dylan - Like a Rolling Stone.mp3')));
-			console.log(computeSimilarity(['Bob Dylan - Like A Rolling Stone - Live 1999.mp3', 'Bob Dylan - Forever Young.mp3', 'The Rolling Stones - RubyTuesday.mp3'], 'bob dylan like a rolling stone'));
+			if (process.argv[3]) {
+				console.log(computeSimilarity(process.argv[2],process.argv[3]));
+	    } else {
+			  console.log(computeSimilarity('bob dylan like a rolling stone', 'bob dylan like a rolling stone'));
+			  console.log(computeSimilarity('bob dylan like a rolling stone', 'Bob Dylan - Like a Rolling Stone.mp3'));
+			  console.log(computeSimilarity('Bob Dylan - Like a Rolling Stone.mp3'));
+			  console.log(computeSimilarity('bob dylan like a rolling stone', computeSimilarity('Bob Dylan - Like a Rolling Stone.mp3')));
+				console.log(computeSimilarity(['Bob Dylan - Like A Rolling Stone - Live 1999.mp3', 'Bob Dylan - Forever Young.mp3', 'The Rolling Stones - RubyTuesday.mp3'], 'bob dylan like a rolling stone'));
+			}
 		})();
 	}
 
