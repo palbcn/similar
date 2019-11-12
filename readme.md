@@ -1,4 +1,4 @@
-# similar
+# simon-white-similarity
 
 Detects similar strings
 using the Simon White's approximate string 	matching method, 
@@ -13,11 +13,11 @@ Original Java implementation by Simon White. First refactored and translated to 
     
 ## installation
 
-    npm install similar    
+    npm install simon-white-similarity    
     
 ## usage
 
-    const computeSimilarity  = require('similar');  
+    const computeSimilarity  = require('simon-white-similarity');  
     
     // computes similarity between two strings
     let similarity = computeSimilarity('Tàkë á sad song and mäke it bétter','take a bad song made better');    

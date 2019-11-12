@@ -1,6 +1,6 @@
 {
-  "name": "similar",
-  "version": "1.0.2",
+  "name": "simon-white-similarity",
+  "version": "1.0.3",
   "description": "Detects similar strings using the Simon White's approximate string matching method, that computes the Sørensen–Dice similarity coefficient of sets of adjacent letter pairs.",
   "main": "index.js",
   "scripts": {
