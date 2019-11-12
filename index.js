@@ -3,7 +3,7 @@
 	similar - detect similar strings
 	using the Simon White's approximate string 	matching method, 
 	that computes the Sørensen–Dice similarity coefficient
-	of sets of adjacent letter pairs also called bigrams.
+	of sets of adjacent letter pairs (also called bigrams)
 
   based on "How to strike a match" by Simon White
   http://www.devarticles.com/c/a/Development-Cycles/How-to-Strike-a-Match
@@ -12,36 +12,48 @@
 
   Original Java implementation by Simon White
   first refactored and translated to Pascal by palbcn
-  and then readapted to javascript by palbcn
+  and then readapted to javascript by pal bcn
 
-  PAL, Barcelona. <palbcn@yahoo.com> 
+  PAL Barcelona. <palbcn@yahoo.com> 
 
 */
 
 (function simNS() {
   
   const replaceDiacritics = require("replace-diacritics");
+  
+  /** 
+     replace all non word consecutive chars 
+     in a string with the provided replacement 
+     
+     @parm str the target string
+     @parm replaclement the char or string to replace with
+	   @return the result of replacing any non word char with the replacement 
+     
+     example: replaceNonWordChars("blah, bleh:    blih","_") returns "blah_bleh_blih"
+     
+  */
+  function replaceNonWordChars(str,replaclement) {
+    // regex"/" set of"[" non "^" wordchars"\w" "]" one or more consecutive"+" 
+    //   in any occurence"g" 
+    return str.replace(/[^\w]+/g,replaclement);
+  } 
 
 	/** 
   createLetterPairs - private primitive 
-  remove all non chars and transform all accented chars from a string and create
-  an array of adjacent letter pairs.
+  remove all non chars, remove all accented chars 
+  and transform all letters to lower case 
+  and create an array of adjacent letter pairs (aka bigrams)
   
-  @parm str input string
-	
-  @return an array of adjacent letter pairs 
+  @parm str input string	
+  @return an array of adjacent lowercase non-accented letter pairs 
   
+  for.example
+  createLetterPairs("El otoño  vendrá,   con caracolas") returns 
+  [ 'el','lo','ot','to','on','no','ov','ve','en','nd','dr','ra','ac','co',
+    'on','nc','ca','ar','ra','ac','co','ol','la','as' ]  
   */
   function createLetterPairs(str) {
-    
-    // replace all non word chars in the string with the provided replacement char or string
-    //
-    // use a regex
-    //   "["  non "^"    word chars "\w"  "]" in any occurence "g"
-    function replaceNonWordChars(str,replaclementStr) {
-      return str.replace(/[^\w]/g,replaclementStr);
-    };   
-    
 		if (!str) return [];
 		let pairs = [];
 		let s = replaceNonWordChars(replaceDiacritics(str),'').toLowerCase();
@@ -52,23 +64,26 @@
 	}
 
   /**
-  computeSimilarityPairsPrim - private primitive
-  
-	Computes the similarity between two character pairs
-	  iterates through the letter pairs to find the size of the intersection.
-	Note that whenever a match is found, that character pair is removed from the
-	  second array list to prevent us from matching against the same character pair
+	computeSimilarityPairsPrim - private primitive
+	 
+	Computes the similarity between two lists of letter pairs
+	it iterates through the letter pairs to find the size of the intersection.
+	Note that whenever a match is found, that letter pair is removed from the
+	  second list to prevent from matching against the same character pair
 	  multiple times. (Otherwise, 'GGGGG' would score a perfect match against 'GG'.)
 	
-  @input p,q first and second pairs array
+  @input p,q first and second list of letter pairs
   
-  @return the similarity is calculated using the Sørensen–Dice coefficient, twice
-	the size of the intersection over the size of the union (the sum of the individual cardinalities)
-  
+  @return the similarity is calculated using the Sørensen–Dice coefficient
+    equal twice the size of the intersection over the size of the union 
+    (the sum of the individual cardinalities)
+	
+	this function the primitive called by all of the other `computeSimilarity*` 
+  functions later in this module.	
   */
 	function computeSimilarityPairsPrim(p, q) {
 		let intersection = 0;
-		let union = p.length + q.length;
+    let union = p.length + q.length;
 		for (let i = 0, l = p.length; i < l; i++) {  //for each pair in p
 			for (let j = 0, m = q.length; j < m; j++) { // compare with each pair in q
 				if (p[i] == q[j]) {  // if match, 
@@ -78,23 +93,27 @@
 				}
 			}
 		}
+		
 		return 2.0 * intersection / union;  // best is 1 worst is 0
 	}
 
-	// Computes the similarity between two character pairs
-	//   creates a clone of the second pair to not destroy it
+	// Computes the similarity between two lists of letter pairs
+	//   creates a clone of the second list to not destroy it
 	function computeSimilarityBetweenPairs(p, q) {
-		return computeSimilarityPairsPrim(p, q.slice(0));
+		function clone(arr) {
+			return arr.slice(0);
+		}
+		return computeSimilarityPairsPrim(p, clone(q));
 	}
 
 	// Computes the similarity between two strings,
-	//  generates the character pairs from the words of each of the two input strings
+	//  generates the list of letter pairs for each of the two input strings
 	//  and returns their comparison
 	function computeSimilarityBetweenStrings(s, t) {
 		return computeSimilarityPairsPrim(createLetterPairs(s), createLetterPairs(t));
 	}
 
-	// Computes the similarity of a string against an already calculated letter pairs array.
+	// Computes the similarity of a string against a list of letter pairs
 	function computeSimilarityBetweenStringAndPairs(s, p) {
 		return computeSimilarityBetweenPairs(createLetterPairs(s), p);
 	}
@@ -128,7 +147,7 @@
 			else
 				throw new Error('cannot compute similarities');
 
-		} else { // when invoked with a single parameter, return the pairs
+		} else { // when invoked with a single parameter, return the letter pairs
 			return createLetterPairs(a);
       
 			/* previously we returned a function to allow currying ..

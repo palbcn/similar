@@ -8,6 +8,9 @@
   },
   "author": "PAL BCN <palbcn@yahoo.com>",
   "license": "MIT",
+  "dependencies": {
+    "replace-diacritics": "^1.0.0" 
+  },
   "devDependencies": {
     "jest": "^24.9.0"
   }
